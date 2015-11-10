@@ -25,9 +25,13 @@ void mazecell::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         {
             brush.setColor(Qt::darkGreen);
         }
-        else
+        else if(cellRole == END)
         {
             brush.setColor(Qt::darkRed);
+        }
+        else
+        {
+            brush.setColor(Qt::white);
         }
     }
     else
