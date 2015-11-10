@@ -13,6 +13,7 @@
 #include <QVector>
 #include <QList>
 #include <QQueue>
+#include <QTime>
 
 
 #define TEST            true
@@ -76,9 +77,12 @@ private:
     QList<QList<mazecell*> >  *mazeArray;           //2d array of mazecell graphics items
     int mazeRow;
     int mazeCol;
+    int mapperSec;
+    int mapperMin;
     CURRENT_DIRECTION currDir;
     QQueue<QString> mapperQueue;
     QStringList buildList;
+    QTime mapperTime;
 
 
 

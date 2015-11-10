@@ -18,6 +18,10 @@ Widget::Widget(QWidget *parent) :
     mazeRow = 37;
     mazeCol = 37;
     currDir = UP;
+    mapperMin = 0;
+    mapperSec = 0;
+    mapperTime.start();
+//    qDebug() << mapperTime.toString("H:m:s");
 
 
 
@@ -181,7 +185,6 @@ void Widget::checkBounds(int pos)
 
 void Widget::updateDir(QString newDir)
 {
-    qDebug() << newDir;
     switch (currDir)
     {
     case UP:
@@ -353,8 +356,6 @@ void Widget::drawIntersection(QString intersection)
 //builds the maze as instructions are sent from mapper rover
 void Widget::mazeBuild()
 {
-    if(DEBUG)
-        qDebug() << buildList;
     QStringList instruction;
     int dist;
     QString intersection;
@@ -376,7 +377,6 @@ void Widget::mazeBuild()
             dist = QString(instruction.at(0)).toInt(&ok, 10);
             intersection = instruction.at(1);
             newDir = instruction.at(2);
-            qDebug() << instruction;
             if(!ok)
             {
                 erout << "mazeBuild distance int conversion error\n";
@@ -401,12 +401,44 @@ void Widget::mazeBuild()
 
 }
 
+QString timeElapse(int msec)
+{
+    int mins;
+    int secs;
+    int temp = msec-59999;
+    temp = abs(temp);
+    qDebug() << msec;
+    if(msec < 60000)
+    {
+        msec = msec/1000;
+        QString time = QString::number(msec);
+        time.prepend("(00:");
+        time.append(")");
+        return time;
+    }
+    else
+    {
+        secs = msec%60000;
+        mins = msec-temp;
+        QString time = QString::number(mins);
+        time.prepend("(");
+        time.append(":");
+        time.append(QString::number(secs));
+        time.append(")");
+        return time;
 
+    }
+
+
+}
 
 
 //need to send start signal first, then wait for signal from serial port to recieve data as it comes in
 void Widget::on_mapperStart_button_clicked()
 {
+//    mapperTime.start();
+    int timeTemp;
+    QString time;
     QString temp;
     if(TEST)
         mapperDat = mapper->readline("test1.dat");
@@ -417,11 +449,15 @@ void Widget::on_mapperStart_button_clicked()
 
     mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions
     for(int i = 0; i < mapperDat.size(); i++)
-    {
+    {mapperTime.start();
         temp = mapperDat.at(i);
         if(temp.at(0) == 'W')//warning
         {
-            ui->mapperList->addItem(mapperDat.at(i));
+//            timeTemp = mapperTime.elapsed();
+//            time = timeElapse(timeTemp);
+//            temp.prepend(time);
+
+            ui->mapperList->addItem(temp);
             ui->mapperList->item(mapperList_count)->setTextColor(QColor(255,165,0));
             mapperList_count++;
         }
@@ -438,7 +474,13 @@ void Widget::on_mapperStart_button_clicked()
         }
         else//instruction
         {
-            ui->mapperList->addItem(mapperDat.at(i));
+
+//            timeTemp = mapperTime.elapsed();
+//            time = timeElapse(timeTemp);
+//            temp.prepend(time);
+//            qDebug() << mapperTime.toString("H:m:s");
+
+            ui->mapperList->addItem(temp);
             mazeBuild();
             mapperList_count++;
         }

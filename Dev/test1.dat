@@ -1,8 +1,25 @@
 2100l
 3011r
-W: Sample Warning
-3000f
-W: Another Sample warning a bit longer to show the bar at the bottom
-E: Sample Error
+3000b
+3101r
+3001r
+4011r
+2000b
+2101r
+3001r
+5001r
+3100l
+2111l
+3001r
+2000b
+2100l
+3111l
+4100l
+2000b
+2001r
+4111l
+2100l
+2001r
+6000b
 E
 
