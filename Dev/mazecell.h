@@ -29,8 +29,11 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void setpos(int x, int y, int size);
+    void setRole(ROLE role);
+    void setIntersection(INTERSECTION type);
 
-    bool Pressed;
+    bool isMaze;
+    bool isNode;
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

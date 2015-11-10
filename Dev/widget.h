@@ -12,11 +12,24 @@
 #include "mazecell.h"
 #include <QVector>
 #include <QList>
+#include <QQueue>
 
 
 #define TEST            true
-#define GRID_SIZE       76
+#define DEBUG           true
+#define GRID_SIZE       75
 #define CELL_SIZE       10
+
+
+enum CURRENT_DIRECTION          //will state the rovers current direction with respect to where it initialy pointed
+{                               //Rover will always have an initial direction of UP
+    UP,
+    LEFT,
+    RIGHT,
+    DOWN
+};
+
+
 
 namespace Ui {
 class Widget;
@@ -31,7 +44,14 @@ public:
     ~Widget();
 
     QStringList parseM_dat(QStringList dat);
-    void cell_init();
+    void drawStandard();
+    void checkBounds(int pos);
+    void updateDir(QString newDir);
+    void drawIntersection(QString intersection);
+    void mazeBuild();
+
+
+
 
 private slots:
     void on_mapperStart_button_clicked();
@@ -53,10 +73,12 @@ private:
     QStringList userDat;
     int mapperList_count;
     mazecell *cell;
-    QList<QList<mazecell*> >  *mazeArray;//2d array of mazecell graphics items
+    QList<QList<mazecell*> >  *mazeArray;           //2d array of mazecell graphics items
     int mazeRow;
     int mazeCol;
-
+    CURRENT_DIRECTION currDir;
+    QQueue<QString> mapperQueue;
+    QStringList buildList;
 
 
 

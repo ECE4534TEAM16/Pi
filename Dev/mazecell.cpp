@@ -2,7 +2,8 @@
 
 mazecell::mazecell()
 {
-    Pressed = false;
+    isMaze = false;
+    isNode = false;
 
 }
 
@@ -17,13 +18,26 @@ void mazecell::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QRectF rec = boundingRect();
     QBrush brush(Qt::black);
 
-    if(Pressed)
+
+    if(isNode)
     {
-        brush.setColor(Qt::white);
+        if(cellRole == START)
+        {
+            brush.setColor(Qt::darkGreen);
+        }
+        else
+        {
+            brush.setColor(Qt::darkRed);
+        }
     }
     else
     {
-        brush.setColor(Qt::black);
+        if(isMaze)
+        {
+            brush.setColor(Qt::white);
+        }
+        else
+            brush.setColor(Qt::black);
     }
     painter->fillRect(rec, brush);
     painter->drawRect(rec);
@@ -39,9 +53,28 @@ void mazecell::setpos(int x, int y, int size)
     recSize = size;
 }
 
+//allows widget.cpp to define roles and intersection types
+void mazecell::setRole(ROLE role)
+{
+    cellRole = role;
+}
+
+void mazecell::setIntersection(INTERSECTION type)
+{
+    intersectionType = type;
+    if(type == STANDARD)
+    {
+        isNode = false;
+    }
+    else
+    {
+        isNode = true;
+    }
+}
+
 void mazecell::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    Pressed = true;
+    isMaze = true;
     update();
     QGraphicsItem::mousePressEvent(event);
 
@@ -49,7 +82,7 @@ void mazecell::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void mazecell::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    Pressed = false;
+    isMaze = false;
     update();
     QGraphicsItem::mousePressEvent(event);
 }
