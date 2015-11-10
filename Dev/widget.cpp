@@ -13,22 +13,6 @@ Widget::Widget(QWidget *parent) :
 
     scene = new QGraphicsScene(this);
     ui->mazeView->setScene(scene);
-<<<<<<< HEAD
-
-    QBrush redBrush(Qt::red);
-    QBrush whiteBrush(Qt::white);
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
-
-
-    for(int j = 0; j < 75; j++)
-    {
-        for(int i = 0; i < 75; i++)
-        {
-            rectangle = scene->addRect(i*10,j*10,10,10,blackPen,whiteBrush);
-        }
-    }
-=======
     mazeArray = new QList<QList<mazecell*> >; //the first QList represents the columns, second represents the rows
     QList<mazecell*> temp1;
     mazeRow = 37;
@@ -70,7 +54,6 @@ Widget::Widget(QWidget *parent) :
         }
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
->>>>>>> temp
 
     mapper = new SerialPort;
     mapperList_count = 0;
@@ -85,10 +68,7 @@ Widget::~Widget()
     delete ui;
 }
 
-<<<<<<< HEAD
-=======
 //append data to stringlist so that commands can come in over time
->>>>>>> temp
 QStringList Widget::parseM_dat(QStringList dat)
 {
     QString temp;
@@ -128,30 +108,19 @@ QStringList Widget::parseM_dat(QStringList dat)
 
 
 
-<<<<<<< HEAD
-=======
 
->>>>>>> temp
 //need to send start signal first, then wait for signal from serial port to recieve data as it comes in
 void Widget::on_mapperStart_button_clicked()
 {
     QString temp;
-<<<<<<< HEAD
-    if(test)
-=======
     if(TEST)
->>>>>>> temp
         mapperDat = mapper->readline("test1.dat");
     else
     {
         //need to implement serial port recieve here.
     }
 
-<<<<<<< HEAD
-    mapperDat = parseM_dat(mapperDat);
-=======
     mapperDat = parseM_dat(mapperDat); //mapperDat will contain set of instructions
->>>>>>> temp
     for(int i = 0; i < mapperDat.size(); i++)
     {
         temp = mapperDat.at(i);
