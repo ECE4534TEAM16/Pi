@@ -9,9 +9,14 @@
 #include <QString>
 #include <QColor>
 #include "serialport.h"
+#include "mazecell.h"
+#include <QVector>
+#include <QList>
 
 
-#define test        true
+#define TEST            true
+#define GRID_SIZE       76
+#define CELL_SIZE       10
 
 namespace Ui {
 class Widget;
@@ -26,6 +31,7 @@ public:
     ~Widget();
 
     QStringList parseM_dat(QStringList dat);
+    void cell_init();
 
 private slots:
     void on_mapperStart_button_clicked();
@@ -46,6 +52,14 @@ private:
     QStringList mapperDat;
     QStringList userDat;
     int mapperList_count;
+    mazecell *cell;
+    QList<QList<mazecell*> >  *mazeArray;//2d array of mazecell graphics items
+    int mazeRow;
+    int mazeCol;
+
+
+
+
 };
 
 #endif // WIDGET_H

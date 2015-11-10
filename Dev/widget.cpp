@@ -13,20 +13,47 @@ Widget::Widget(QWidget *parent) :
 
     scene = new QGraphicsScene(this);
     ui->mazeView->setScene(scene);
+    mazeArray = new QList<QList<mazecell*> >; //the first QList represents the columns, second represents the rows
+    QList<mazecell*> temp1;
+    mazeRow = 37;
+    mazeCol = 37;
 
-    QBrush redBrush(Qt::red);
-    QBrush whiteBrush(Qt::white);
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
 
-
-    for(int j = 0; j < 75; j++)
+/////////////////////////////////////////MAZE CREATION//////////////////////////////////////////////////////////
+    //creates and instatiates the 76x76 array of custom graphics items used for the graphical maze
+    for(int l = 0 ; l < GRID_SIZE; l++)
     {
-        for(int i = 0; i < 75; i++)
+        temp1.clear();
+        for(int sahn = 0; sahn < GRID_SIZE; sahn++)
         {
-            rectangle = scene->addRect(i*10,j*10,10,10,blackPen,whiteBrush);
+            cell = new mazecell(); //use mazecell pointer to create new mazecell
+            temp1.append(cell); //pass that into the temp array
+        }
+        mazeArray->append(temp1); //push the temp QList<*mazecell> into the master list (2d array)
+    }
+
+    for(int j = 0; j < GRID_SIZE; j++)
+    {
+        for(int i = 0; i < GRID_SIZE; i++)
+        {
+            int tempx = j*CELL_SIZE;
+            int tempy = i*CELL_SIZE;
+            if(i == mazeCol && j == mazeRow)
+            {
+                mazeArray->at(i).at(j)->Pressed = true;
+                //mazeArray->at(i).at(j)->intersectionType = INIT_START; //the physical maze start will always be the middle of the graphical maze
+                mazeArray->at(i).at(j)->setpos(tempx,tempy,CELL_SIZE); //set the position and size of each cell
+                scene->addItem(mazeArray->at(i).at(j)); //add that cell to the scene
+
+            }
+            else
+            {
+            mazeArray->at(i).at(j)->setpos(tempx,tempy,CELL_SIZE); //set the position and size of each cell
+            scene->addItem(mazeArray->at(i).at(j)); //add that cell to the scene
+            }
         }
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     mapper = new SerialPort;
     mapperList_count = 0;
@@ -41,6 +68,7 @@ Widget::~Widget()
     delete ui;
 }
 
+//append data to stringlist so that commands can come in over time
 QStringList Widget::parseM_dat(QStringList dat)
 {
     QString temp;
@@ -80,18 +108,19 @@ QStringList Widget::parseM_dat(QStringList dat)
 
 
 
+
 //need to send start signal first, then wait for signal from serial port to recieve data as it comes in
 void Widget::on_mapperStart_button_clicked()
 {
     QString temp;
-    if(test)
+    if(TEST)
         mapperDat = mapper->readline("test1.dat");
     else
     {
         //need to implement serial port recieve here.
     }
 
-    mapperDat = parseM_dat(mapperDat);
+    mapperDat = parseM_dat(mapperDat); //mapperDat will contain set of instructions
     for(int i = 0; i < mapperDat.size(); i++)
     {
         temp = mapperDat.at(i);

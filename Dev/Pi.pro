@@ -15,11 +15,13 @@ SOURCES += main.cpp\
         widget.cpp \
     mazesolve.cpp \
     serialport.cpp \
-    celldialog.cpp
+    celldialog.cpp \
+    mazecell.cpp
 
 HEADERS  += widget.h \
     mazesolve.h \
     serialport.h \
-    celldialog.h
+    celldialog.h \
+    mazecell.h
 
 FORMS    += widget.ui
