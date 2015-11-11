@@ -1,10 +1,13 @@
 #include "mazecell.h"
+#include "celldialog.h"
+#include <QDebug>
+
+
 
 mazecell::mazecell()
 {
     isMaze = false;
     isNode = false;
-
 }
 
 QRectF mazecell::boundingRect() const
@@ -78,16 +81,58 @@ void mazecell::setIntersection(INTERSECTION type)
 
 void mazecell::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    isMaze = true;
-    update();
     QGraphicsItem::mousePressEvent(event);
+    if(event->button() == Qt::RightButton)
+    {
+        if(isNode) //allow this to be picked as start or stop point
+        {
+            CellDialog *cd = new CellDialog(*this);
+            connect(cd, SIGNAL(cellStartChange()), this, SLOT(cellDialogStartChange()));
+            connect(cd, SIGNAL(cellEndChange()), this, SLOT(cellDialogEndChange()));
+            cd->show();
+        }
+    }
+    update();
+
 
 }
 
-void mazecell::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void mazecell::cellDialogStartChange()
 {
-    isMaze = false;
-    update();
-    QGraphicsItem::mousePressEvent(event);
+    qDebug() << "start Slot working";
+    emit StartChange(); //emits a signal to a slot in widget.cpp
 }
+
+void mazecell::cellDialogEndChange()
+{
+    qDebug() << "end Slot working";
+    emit EndChange(); //emits a signal to a slot in widget.cpp
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

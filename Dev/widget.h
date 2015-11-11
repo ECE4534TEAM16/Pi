@@ -52,7 +52,9 @@ public:
     void mazeBuild();
 
 
-
+public slots:
+    void on_RoleStartChange();
+    void on_RoleEndChange();
 
 private slots:
     void on_mapperStart_button_clicked();
@@ -79,6 +81,10 @@ private:
     int mazeCol;
     int mapperSec;
     int mapperMin;
+    int startRow;
+    int startCol;
+    int endRow;
+    int endCol;
     CURRENT_DIRECTION currDir;
     QQueue<QString> mapperQueue;
     QStringList buildList;

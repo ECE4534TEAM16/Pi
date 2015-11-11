@@ -20,11 +20,10 @@ Widget::Widget(QWidget *parent) :
     currDir = UP;
     mapperMin = 0;
     mapperSec = 0;
-    mapperTime.start();
-//    qDebug() << mapperTime.toString("H:m:s");
-
-
-
+    startCol = -1;
+    startRow = -1;
+    endCol = -1;
+    endRow = -1;
 
 
 
@@ -37,6 +36,8 @@ Widget::Widget(QWidget *parent) :
         {
             cell = new mazecell();          //use mazecell pointer to create new mazecell
             temp1.append(cell);             //pass that into the temp array
+            connect(cell, SIGNAL(StartChange()), this, SLOT(on_RoleStartChange()));
+            connect(cell, SIGNAL(EndChange()), this, SLOT(on_RoleEndChange()));
         }
         mazeArray->append(temp1);           //push the temp QList<*mazecell> into the master list (2d array)
     }
@@ -55,6 +56,8 @@ Widget::Widget(QWidget *parent) :
                 mazeArray->at(i).at(j)->setRole(START);                     //will be the default start for the maze
                 mazeArray->at(i).at(j)->setpos(tempx,tempy,CELL_SIZE);      //set the position and size of each cell
                 scene->addItem(mazeArray->at(i).at(j));                     //add that cell to the scene
+                startCol = i;
+                startRow = j;
 
             }
             else
@@ -70,6 +73,8 @@ Widget::Widget(QWidget *parent) :
 
     mapper = new SerialPort;
     mapperList_count = 0;
+
+
 }
 
 
@@ -115,7 +120,7 @@ QStringList Widget::parseM_dat(QStringList dat)
             templist.append(returnTemp);
             returnTemp.clear();
         }
-        else //this is the end character
+        else //this is the end character or an error/warning
         {
             if(temp.size() == 1)
                 templist.append("At end of maze");
@@ -401,6 +406,67 @@ void Widget::mazeBuild()
 
 }
 
+//
+void Widget::on_RoleStartChange()
+{
+    mazeArray->at(startCol).at(startRow)->setRole(NORMAL);
+    //go through array to find curre
+    for(int i = 0; i < GRID_SIZE; i++)
+    {
+        for(int j = 0; j < GRID_SIZE; j++)
+        {
+            if(mazeArray->at(i).at(j)->cellRole == START)
+            {
+                startCol = i;
+                startRow = j;
+            }
+        }
+    }
+    qDebug() << "Start signal recieved at main";
+}
+
+void Widget::on_RoleEndChange()
+{
+    if(endCol == -1 && endRow == -1) //setting the initial end point
+    {
+        //go through array to find current end node
+        //set endcol and endrow to those values
+        for(int i = 0; i < GRID_SIZE; i++)
+        {
+            for(int j = 0; j < GRID_SIZE; j++)
+            {
+                if(mazeArray->at(i).at(j)->cellRole == END)
+                {
+                    endCol = i;
+                    endRow = j;
+                }
+            }
+        }
+    }
+    else
+    {
+        mazeArray->at(endCol).at(endRow)->setRole(NORMAL);
+        //go through array to find curre
+        for(int i = 0; i < GRID_SIZE; i++)
+        {
+            for(int j = 0; j < GRID_SIZE; j++)
+            {
+                if(mazeArray->at(i).at(j)->cellRole == END)
+                {
+                    endCol = i;
+                    endRow = j;
+                }
+            }
+        }
+
+    }
+    qDebug() << "End signal recieved at main";
+}
+
+
+
+
+
 QString timeElapse(int msec)
 {
     int mins;
@@ -437,7 +503,7 @@ QString timeElapse(int msec)
 void Widget::on_mapperStart_button_clicked()
 {
 //    mapperTime.start();
-    int timeTemp;
+//    int timeTemp;
     QString time;
     QString temp;
     if(TEST)
@@ -453,9 +519,6 @@ void Widget::on_mapperStart_button_clicked()
         temp = mapperDat.at(i);
         if(temp.at(0) == 'W')//warning
         {
-//            timeTemp = mapperTime.elapsed();
-//            time = timeElapse(timeTemp);
-//            temp.prepend(time);
 
             ui->mapperList->addItem(temp);
             ui->mapperList->item(mapperList_count)->setTextColor(QColor(255,165,0));
@@ -474,12 +537,6 @@ void Widget::on_mapperStart_button_clicked()
         }
         else//instruction
         {
-
-//            timeTemp = mapperTime.elapsed();
-//            time = timeElapse(timeTemp);
-//            temp.prepend(time);
-//            qDebug() << mapperTime.toString("H:m:s");
-
             ui->mapperList->addItem(temp);
             mazeBuild();
             mapperList_count++;

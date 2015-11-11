@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 #include <qdebug.h>
+#include <QGraphicsSceneMouseEvent>
 
 enum ROLE {START, END, NORMAL};
 enum INTERSECTION
@@ -20,8 +21,11 @@ enum INTERSECTION
 };
 
 
-class mazecell : public QGraphicsItem
+class mazecell :  public QObject, public QGraphicsItem
 {
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
 public:
     mazecell();
 
@@ -34,23 +38,28 @@ public:
 
     bool isMaze;
     bool isNode;
+    ROLE cellRole;
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+signals:
+    void StartChange();
+    void EndChange();
 
+private slots:
+    void cellDialogStartChange();
+    void cellDialogEndChange();
 
 private:
     int x_pos;
     int y_pos;
     int recSize;
-    ROLE cellRole;
+
     INTERSECTION intersectionType;
 
-//signals:
 
-//public slots:
 };
+
 
 #endif // MAZECELL_H

@@ -1,43 +1,52 @@
 #include "celldialog.h"
-#include <QtWidgets>
+#include <QWidget>
 
-//CellDialog::CellDialog(QWidget *parent) :
-//    QDialog(parent)
-//{
-//}
 
-//CellDialog::CellDialog(MazeCell &link)
-//{
-//    cell = &link;
+CellDialog::CellDialog(QWidget *parent) :
+    QDialog(parent)
+{
+}
 
-//    label1 = new QLabel("Change Role");
-//    roleCombo = new QComboBox;
-//    roleCombo->addItem("NORMAL");
-//    roleCombo->addItem("START");
-//    roleCombo->addItem("END");
-//    QHBoxLayout *h1 = new QHBoxLayout;
-//    h1->addWidget(label1);
-//    h1->addWidget(roleCombo);
-//    okButton = new QPushButton("Ok");
-//    cancelButton = new QPushButton("Cancel");
-//    QHBoxLayout *h2 = new QHBoxLayout;
-//    h2->addWidget(okButton);
-//    h2->addWidget(cancelButton);
-//    QVBoxLayout *main = new QVBoxLayout;
-//    main->addLayout(h1);
-//    main->addLayout(h2);
-//    setLayout(main);
+CellDialog::CellDialog(mazecell &link)
+{
+    cell = &link;
 
-//    //connection
-//    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
-//    connect(cancelButton, SIGNAL(clicked()), this, SLOT(close()));
-//}
+    label1 = new QLabel("Change Role");
+    roleCombo = new QComboBox;
+    roleCombo->addItem("START");
+    roleCombo->addItem("END");
+    QHBoxLayout *h1 = new QHBoxLayout;
+    h1->addWidget(label1);
+    h1->addWidget(roleCombo);
+    okButton = new QPushButton("Ok");
+    cancelButton = new QPushButton("Cancel");
+    QHBoxLayout *h2 = new QHBoxLayout;
+    h2->addWidget(okButton);
+    h2->addWidget(cancelButton);
+    QVBoxLayout *main = new QVBoxLayout;
+    main->addLayout(h1);
+    main->addLayout(h2);
+    setLayout(main);
 
-//void CellDialog::okClicked(){
-//    ROLE theRole;
-//    if(roleCombo->currentText() == "NORMAL")theRole = NORMAL;
-//    else if(roleCombo->currentText() == "START")theRole = START;
-//    else if(roleCombo->currentText() == "END")theRole = END;
-//    cell->setRole(theRole);
-//    this->close();
-//}
+    //connection
+    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(close()));
+}
+
+void CellDialog::okClicked()
+{
+    ROLE theRole;
+    if(roleCombo->currentText() == "START")
+        theRole = START;
+    else if(roleCombo->currentText() == "END")
+        theRole = END;
+    if(theRole != cell->cellRole)
+    {
+        cell->setRole(theRole);
+        if(theRole == START)
+            emit cellStartChange();
+        else if(theRole == END)
+            emit cellEndChange();
+    }
+    this->close();
+}
