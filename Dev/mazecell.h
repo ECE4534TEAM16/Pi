@@ -38,6 +38,8 @@ public:
 
     bool isMaze;
     bool isNode;
+    INTERSECTION intersectionType;
+
     ROLE cellRole;
 
 protected:
@@ -55,9 +57,6 @@ private:
     int x_pos;
     int y_pos;
     int recSize;
-
-    INTERSECTION intersectionType;
-
 
 };
 
