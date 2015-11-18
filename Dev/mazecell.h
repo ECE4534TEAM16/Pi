@@ -6,7 +6,7 @@
 #include <qdebug.h>
 #include <QGraphicsSceneMouseEvent>
 
-enum ROLE {START, END, NORMAL};
+enum ROLE {START, END, NORMAL, NONMAZE};
 enum INTERSECTION
 {
     INIT_START,

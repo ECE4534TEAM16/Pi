@@ -1,0 +1,8 @@
+//add created files to be able to commit them
+git add . 
+//commit local changes with commit message
+git commit -m 'text'
+//push commited changes to master
+git push origin master
+//updates local branch
+git pull

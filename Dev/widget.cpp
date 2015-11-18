@@ -63,6 +63,7 @@ Widget::Widget(QWidget *parent) :
             else
             {
             mazeArray->at(i).at(j)->setpos(tempx,tempy,CELL_SIZE);          //set the position and size of each cell
+            mazeArray->at(i).at(j)->setRole(NONMAZE);
             scene->addItem(mazeArray->at(i).at(j));                         //add that cell to the scene
             }
         }
@@ -409,13 +410,13 @@ void Widget::mazeBuild()
 //
 void Widget::on_RoleStartChange()
 {
-    mazeArray->at(startCol).at(startRow)->setRole(NORMAL);
+    mazeArray->at(startCol).at(startRow)->cellRole = NORMAL;
     //go through array to find curre
     for(int i = 0; i < GRID_SIZE; i++)
     {
         for(int j = 0; j < GRID_SIZE; j++)
         {
-            if(mazeArray->at(i).at(j)->cellRole == START)
+            if(mazeArray->at(i).at(j)->cellRole == START && mazeArray->at(i).at(j)->isMaze)
             {
                 startCol = i;
                 startRow = j;

@@ -13,7 +13,7 @@ CellDialog::CellDialog(mazecell &link)
 
     label1 = new QLabel("Change Role");
     roleCombo = new QComboBox;
-    if(cell->intersectionType == DEAD_END)
+    if(cell->intersectionType == DEAD_END || cell->intersectionType == INIT_START)
         roleCombo->addItem("START");
     roleCombo->addItem("END");
     QHBoxLayout *h1 = new QHBoxLayout;
@@ -28,6 +28,7 @@ CellDialog::CellDialog(mazecell &link)
     main->addLayout(h1);
     main->addLayout(h2);
     setLayout(main);
+    qDebug() << cell->cellRole;
 
     //connection
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));

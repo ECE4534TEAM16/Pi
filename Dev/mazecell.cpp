@@ -64,6 +64,7 @@ void mazecell::setpos(int x, int y, int size)
 void mazecell::setRole(ROLE role)
 {
     cellRole = role;
+    update();
 }
 
 void mazecell::setIntersection(INTERSECTION type)

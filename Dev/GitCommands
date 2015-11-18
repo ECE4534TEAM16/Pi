@@ -4,5 +4,5 @@ git add .
 git commit -m 'text'
 //push commited changes to master
 git push origin master
-//updates local branch
+//updates local branch from online, combo of fetch and merge
 git pull
