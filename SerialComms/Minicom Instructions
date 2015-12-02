@@ -1,0 +1,5 @@
+Install minicom
+to configure for use with wifly's -> sudo minicom -s
+to see where wiflys are connected use -> sudo dmesg | grep tty
+exit minicom setup and should automatically enter into serial comminucation mode
+
