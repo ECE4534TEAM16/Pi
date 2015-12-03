@@ -24,7 +24,9 @@ Widget::Widget(QWidget *parent) :
     startRow = -1;
     endCol = -1;
     endRow = -1;
+    mapper_completed = false;
 
+    ports = new SerialPort();
 
 
 /////////////////////////////////////////MAZE CREATION//////////////////////////////////////////////////////////
@@ -72,7 +74,6 @@ Widget::Widget(QWidget *parent) :
 
 
 
-    mapper = new SerialPort;
     mapperList_count = 0;
 
 
@@ -508,15 +509,24 @@ void Widget::on_mapperStart_button_clicked()
     QString time;
     QString temp;
     if(TEST)
-        mapperDat = mapper->readline("test1.dat");
+        mapperDat = ports->readline("test1.dat");
     else
     {
-        //need to implement serial port recieve here.
+        ports->sendMapperStartSignal(); //send the signal to start the mapper rover
+        while(!ports->mapperFinished)
+        {
+            QString received;
+            received = ;
+
+
+
+        }
     }
 
     mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions
     for(int i = 0; i < mapperDat.size(); i++)
-    {mapperTime.start();
+    {
+        mapperTime.start();
         temp = mapperDat.at(i);
         if(temp.at(0) == 'W')//warning
         {
@@ -535,6 +545,7 @@ void Widget::on_mapperStart_button_clicked()
         {
             //set some kind of flag indicating that the end of the maze has been reached
             //should no longer recieve data from mapper rover
+            mapper_completed = true;
         }
         else//instruction
         {
@@ -543,6 +554,7 @@ void Widget::on_mapperStart_button_clicked()
             mapperList_count++;
         }
     }
+
 
 }
 
@@ -553,6 +565,24 @@ void Widget::on_userStart_button_clicked()
 
 void Widget::on_mazeSolve_button_clicked()
 {
+    if(!mapper_completed)
+    {
+        QMessageBox mazeSolve(this);
+        mazeSolve.setText("The mapper rover must be run before the maze is solved");
+        mazeSolve.setIcon(QMessageBox::Information);
+        mazeSolve.setStandardButtons(QMessageBox::Ok);
+        mazeSolve.setDefaultButton(QMessageBox::Ok);
+        mazeSolve.setWindowTitle("Unable to Solve");
+        int ret = mazeSolve.exec();
+        switch(ret)
+        {
+        case QMessageBox::Ok:
+            break;
+        default:
+            erout << "Error, Reached default case in Widget::on_mazeSolve_button_clicked";
+            exit(EXIT_FAILURE);
+        }
+    }
 
 }
 

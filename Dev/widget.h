@@ -70,8 +70,7 @@ private:
     QGraphicsScene *scene;
     QGraphicsEllipseItem *ellipse;
     QGraphicsRectItem *rectangle;
-    SerialPort *mapper;
-    SerialPort *user;
+    SerialPort *ports;
     QStringList mapperDat;
     QStringList userDat;
     int mapperList_count;
@@ -89,6 +88,7 @@ private:
     QQueue<QString> mapperQueue;
     QStringList buildList;
     QTime mapperTime;
+    bool mapper_completed;
 
 
 

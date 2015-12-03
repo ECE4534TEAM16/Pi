@@ -100,18 +100,13 @@ void Dialog::readSerial()
 //    {
         // no parsed value yet so continue accumulating bytes from serial in the buffer.
 
-        while(arduino->atEnd())
-        {
-            QByteArray temp;
-            temp = arduino->readAll();
-            serialData.append(temp);
-//            const char* dat = serialData.constData();
-//            arduino->write(dat, 1);
-            //serialBuffer = serialBuffer + QString::fromStdString(serialData.toStdString());
-
-        }
+        serialData = arduino->readAll();
         qDebug() << serialData;
+        const char* dat = serialData.constData();
+        arduino->write(dat, 1);
+        serialBuffer = serialBuffer + QString::fromStdString(serialData.toStdString());
         serialData.clear();
+
 //    }
 //    else
 //    {
