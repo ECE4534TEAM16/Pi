@@ -3,6 +3,14 @@
 
 SerialPort::SerialPort()
 {
+    testList.append("S");
+    testList.append("l");
+    testList.append("r");
+    testList.append("l");
+    testList.append("l");
+    testList.append("E");
+    count = 0;
+
     mapperFinished = false;
     mapper_serial_number = "A702ZK6O";
     user_serial_number = "AD02FKX4";
@@ -60,6 +68,12 @@ SerialPort::SerialPort()
         user->setFlowControl(QSerialPort::NoFlowControl);
         user->setParity(QSerialPort::NoParity);
         user->setStopBits(QSerialPort::OneStop);
+        user->write("S");
+        user->write("l");
+        user->write("r");
+        user->write("l");
+        user->write("l");
+        user->write("E");
         QObject::connect(user, SIGNAL(readyRead()), this, SLOT(readUserSerial()));
     }
 
@@ -170,7 +184,7 @@ void SerialPort::readMapperSerial()
     QRegExp re("[A-Za-z0-9]");
     tempstr.remove(QChar(QChar::Null));
     qDebug() << tempstr;
-    if(tempstr.contains(re))                    //re.exactMatch(tempstr)
+    if(tempstr.contains(re) || tempstr.contains("#" || tempstr.contains("!" || tempstr.contains("."))))                    //re.exactMatch(tempstr)
     {
         qDebug() << "passed mapper regexp";
         int length = tempstr.length();
@@ -264,6 +278,23 @@ void SerialPort::sendUserSerial()
 
 void SerialPort::readUserSerial()
 {
+
+//    user_serialData.clear();
+//    user_serialData = user->readAll();
+//    qDebug() << "user data read in from serial port";
+//    QString tempstr = QString::fromStdString(user_serialData.toStdString());
+//    qDebug() << "tempstr created";
+//    QRegExp re("[A-Za-z0-9]");
+//    tempstr.remove(QChar(QChar::Null));
+//    qDebug() << tempstr;
+//    int length = tempstr.length();
+//    const char* dat = testList.at(count).toStdString().c_str();
+//    user->write(dat, length); //used to echo characters back, will not be in release
+//    userBuffer.append(dat);
+//    user_serialData.clear();
+
+
+
 
 }
 

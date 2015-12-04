@@ -43,12 +43,15 @@ private slots:
 
 private:
 
-
+    int count;
+    QStringList testList;
     QSerialPort *mapper;
     QSerialPort *user;
     QString user_serial_number; //AD02FKX4
     QString mapper_serial_number; //A702ZKQU
     QByteArray mapper_serialData;
+    QByteArray user_serialData;
+    QString userBuffer;
     QString mapperBuffer;
     QString parsed_mapData;
     bool mapperFinished;
