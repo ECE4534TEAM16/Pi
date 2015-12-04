@@ -73,7 +73,7 @@ Widget::Widget(QWidget *parent) :
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
+    connect(ports, SIGNAL(recieveMapperInstr()), this, SLOT(mapper_recieveData()));
     mapperList_count = 0;
 
 
@@ -85,6 +85,8 @@ Widget::Widget(QWidget *parent) :
 
 Widget::~Widget()
 {
+    qDebug () << "main destructor called";
+    delete ports;
     delete ui;
 }
 
@@ -465,68 +467,15 @@ void Widget::on_RoleEndChange()
     qDebug() << "End signal recieved at main";
 }
 
-
-
-
-
-QString timeElapse(int msec)
+void Widget::mapper_recieveData() //a full instruction or error has been recieved and signal sent from serialport.cpp
 {
-    int mins;
-    int secs;
-    int temp = msec-59999;
-    temp = abs(temp);
-    qDebug() << msec;
-    if(msec < 60000)
-    {
-        msec = msec/1000;
-        QString time = QString::number(msec);
-        time.prepend("(00:");
-        time.append(")");
-        return time;
-    }
-    else
-    {
-        secs = msec%60000;
-        mins = msec-temp;
-        QString time = QString::number(mins);
-        time.prepend("(");
-        time.append(":");
-        time.append(QString::number(secs));
-        time.append(")");
-        return time;
-
-    }
-
-
-}
-
-
-//need to send start signal first, then wait for signal from serial port to recieve data as it comes in
-void Widget::on_mapperStart_button_clicked()
-{
-//    mapperTime.start();
-//    int timeTemp;
-    QString time;
     QString temp;
-    if(TEST)
-        mapperDat = ports->readline("test1.dat");
-    else
-    {
-        ports->sendMapperStartSignal(); //send the signal to start the mapper rover
-        while(!ports->mapperFinished)
-        {
-            QString received;
-            received = ;
-
-
-
-        }
-    }
-
-    mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions
+    mapperDat.append(ports->list); //will copy what is in the instruction buffer
+    ports->list.clear(); //clears list instruction buffer
+    //update ui with current instruction
+    mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions, use these processed instructions to update ui
     for(int i = 0; i < mapperDat.size(); i++)
     {
-        mapperTime.start();
         temp = mapperDat.at(i);
         if(temp.at(0) == 'W')//warning
         {
@@ -554,8 +503,24 @@ void Widget::on_mapperStart_button_clicked()
             mapperList_count++;
         }
     }
+    mapperDat.clear();
 
 
+}
+
+
+//need to send start signal first, then wait for signal from serial port to recieve data as it comes in
+void Widget::on_mapperStart_button_clicked()
+{
+    if(TEST)
+    {
+        mapperDat = ports->readline("test1.dat");
+        Widget::mapper_recieveData();
+    }
+    else
+    {
+        ports->sendMapperStartSignal(); //send the signal to start the mapper rover
+    }
 }
 
 void Widget::on_userStart_button_clicked()

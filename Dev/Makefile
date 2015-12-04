@@ -54,6 +54,7 @@ SOURCES       = main.cpp \
 		serialport.cpp \
 		celldialog.cpp \
 		mazecell.cpp moc_widget.cpp \
+		moc_serialport.cpp \
 		moc_celldialog.cpp \
 		moc_mazecell.cpp
 OBJECTS       = main.o \
@@ -63,6 +64,7 @@ OBJECTS       = main.o \
 		celldialog.o \
 		mazecell.o \
 		moc_widget.o \
+		moc_serialport.o \
 		moc_celldialog.o \
 		moc_mazecell.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -326,13 +328,16 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_widget.cpp moc_celldialog.cpp moc_mazecell.cpp
+compiler_moc_header_make_all: moc_widget.cpp moc_serialport.cpp moc_celldialog.cpp moc_mazecell.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_widget.cpp moc_celldialog.cpp moc_mazecell.cpp
+	-$(DEL_FILE) moc_widget.cpp moc_serialport.cpp moc_celldialog.cpp moc_mazecell.cpp
 moc_widget.cpp: serialport.h \
 		mazecell.h \
 		widget.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/tyler/Pi/Dev -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include widget.h -o moc_widget.cpp
+
+moc_serialport.cpp: serialport.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/tyler/Pi/Dev -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include serialport.h -o moc_serialport.cpp
 
 moc_celldialog.cpp: mazecell.h \
 		celldialog.h
@@ -386,6 +391,9 @@ mazecell.o: mazecell.cpp mazecell.h \
 
 moc_widget.o: moc_widget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_widget.o moc_widget.cpp
+
+moc_serialport.o: moc_serialport.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_serialport.o moc_serialport.cpp
 
 moc_celldialog.o: moc_celldialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_celldialog.o moc_celldialog.cpp

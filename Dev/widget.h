@@ -55,6 +55,7 @@ public:
 public slots:
     void on_RoleStartChange();
     void on_RoleEndChange();
+    void mapper_recieveData();
 
 private slots:
     void on_mapperStart_button_clicked();
