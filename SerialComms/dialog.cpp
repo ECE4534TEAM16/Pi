@@ -5,13 +5,16 @@
 #include <string>
 #include <QDebug>
 #include <QMessageBox>
+#include <iostream>
+#include <QRegExp>
 
+using namespace std;
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
-    mapper_serial_number = "A702ZKQU";
+    mapper_serial_number = "A702ZK6O";
     ui->setupUi(this);
     ui->temp_lcdNumber->display("-------");
     arduino = new QSerialPort(this);
@@ -67,6 +70,11 @@ Dialog::Dialog(QWidget *parent) :
         arduino->setParity(QSerialPort::NoParity);
         arduino->setStopBits(QSerialPort::OneStop);
         QObject::connect(arduino, SIGNAL(readyRead()), this, SLOT(readSerial()));
+//        while(true)
+//        {
+//            qDebug() << "send data";
+//            sendData();
+//        }
     }
     else
     {
@@ -79,6 +87,7 @@ Dialog::~Dialog()
 {
     if(arduino->isOpen()){
         arduino->close(); //    Close the serial port if it's open.
+        qDebug() << "serial port closed";
     }
     delete ui;
 }
@@ -99,13 +108,23 @@ void Dialog::readSerial()
 //    if(buffer_split.length() < 3)
 //    {
         // no parsed value yet so continue accumulating bytes from serial in the buffer.
-
-        serialData = arduino->readAll();
-        qDebug() << serialData;
-        const char* dat = serialData.constData();
-        arduino->write(dat, 1);
-        serialBuffer = serialBuffer + QString::fromStdString(serialData.toStdString());
         serialData.clear();
+        serialData = arduino->readAll();
+        QString tempstr = QString::fromStdString(serialData.toStdString());
+        qDebug() << tempstr;
+        //QString tempstr = serialData.at(serialData.length());
+        //QRegExp re("[^a-zA-Z\\d\\s]");
+        QRegExp re("[A-Za-z0-9]");
+        if(tempstr.contains(re))                    //re.exactMatch(tempstr)
+        {
+            qDebug() << "passed regexp";
+            int length = tempstr.length();
+            const char* dat = tempstr.toStdString().c_str();
+            arduino->write(dat, length);
+            serialBuffer = serialBuffer + tempstr;
+            serialData.clear();
+        }
+
 
 //    }
 //    else
@@ -119,6 +138,20 @@ void Dialog::readSerial()
 //        parsed_data = QString::number(temperature_value, 'g', 4); // format precision of temperature_value to 4 digits or fewer
 //        Dialog::updateTemperature(parsed_data);
 //    }
+
+}
+
+void Dialog::sendData()
+{
+    char temp;
+    cout << "Input Character: ";
+    cin >> temp;
+    serialData.append(temp);
+    qDebug() << serialData;
+    const char* dat = serialData.constData();
+    qDebug() << dat;
+    arduino->write(dat, 1);
+    serialData.clear();
 
 }
 

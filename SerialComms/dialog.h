@@ -20,6 +20,7 @@ public:
 
 private slots:
     void readSerial();
+    void sendData();
     void updateTemperature(QString);
 
 private:
