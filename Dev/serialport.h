@@ -35,7 +35,7 @@ signals:
     void recieveMapperInstr();
 
 private slots:
-    QString readMapperSerial();
+    void readMapperSerial();
     void sendMapperStart();
     void sendUserStart();
     void sendUserSerial();

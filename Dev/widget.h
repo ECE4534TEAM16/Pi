@@ -16,7 +16,7 @@
 #include <QTime>
 
 
-#define TEST            true
+#define TEST            false
 #define DEBUG           true
 #define GRID_SIZE       75
 #define CELL_SIZE       10

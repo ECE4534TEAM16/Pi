@@ -79,7 +79,7 @@ static const uint qt_meta_data_SerialPort[] = {
     QMetaType::Void,
 
  // slots: parameters
-    QMetaType::QString,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -97,8 +97,7 @@ void SerialPort::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->startMapper(); break;
         case 1: _t->startUser(); break;
         case 2: _t->recieveMapperInstr(); break;
-        case 3: { QString _r = _t->readMapperSerial();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
+        case 3: _t->readMapperSerial(); break;
         case 4: _t->sendMapperStart(); break;
         case 5: _t->sendUserStart(); break;
         case 6: _t->sendUserSerial(); break;
@@ -127,6 +126,7 @@ void SerialPort::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
     }
+    Q_UNUSED(_a);
 }
 
 const QMetaObject SerialPort::staticMetaObject = {

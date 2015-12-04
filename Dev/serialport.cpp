@@ -156,10 +156,11 @@ QStringList SerialPort::returnList()
     return list;
 }
 
-QString SerialPort::readMapperSerial()
+void SerialPort::readMapperSerial()
 {
     qDebug() << "in mapper read serial";
 
+/*                 Serial Communiction In                           */
 
     mapper_serialData.clear();
     mapper_serialData = mapper->readAll();
@@ -168,76 +169,80 @@ QString SerialPort::readMapperSerial()
     qDebug() << "tempstr created";
     QRegExp re("[A-Za-z0-9]");
     tempstr.remove(QChar(QChar::Null));
-    qDebug() << "removed tempstr null characters";
     qDebug() << tempstr;
     if(tempstr.contains(re))                    //re.exactMatch(tempstr)
     {
         qDebug() << "passed mapper regexp";
         int length = tempstr.length();
-        qDebug() << "provided length from tempstr";
         const char* dat = tempstr.toStdString().c_str();
-        qDebug() << "const char created";
-        qDebug() << dat;
-        mapper->write(dat, length);
-        qDebug() << "wrote to serial port";
+        mapper->write(dat, length); //used to echo characters back, will not be in release
+        mapperBuffer.append(dat);
         mapper_serialData.clear();
-        qDebug() << "cleared mapper serial data";
     }
+/*                             END                                   */
 
-    return tempstr;
+    qDebug() << mapperBuffer;
+    if(mapperBuffer.at(0) == 'E') //end
+    {
+        list.append(mapperBuffer);
+        emit recieveMapperInstr();
+        return;
+    }
+    else if(mapperBuffer.contains("#")) //error or warning somewhere
+    {
+        if(mapperBuffer.contains(".")) //complete error has been recieved
+        {
+            bool error = false;
+            int start;
+            int end;
+            QString tempdat;
+            for(int j = 0; j < mapperBuffer.length(); j++)
+            {
+                if(mapperBuffer.at(j) == '#') // beggingin of error message
+                {
+                    error = true;
+                    start = j;
+                }
+                if(mapperBuffer.at(j) == '!') // beggingin of warning message
+                {
+                    start = j;
+                }
+                if(mapperBuffer.at(j) == '.') // beggingin of error/warning message
+                {
+                    end = j;
+                }
+            }
+            mapperBuffer.remove(start,1);
+            start++;
+            int index = start;
 
+            if(error)
+                tempdat.append("Error: ");
+            else
+                tempdat.append("Warning: ");
 
-
-
-//    QByteArray temp;
-//    temp = mapper->readAll();
-//    mapperBuffer.append(QString::fromStdString(temp.toStdString()));
-//    qDebug() << mapperBuffer;
-
-//    if(mapperBuffer.at(0) == 'E') //end
-//    {
-//        list.append(mapperBuffer);
-//        emit recieveMapperInstr();
-//    }
-//    else if(mapperBuffer.contains("!")) //error or warning somewhere
-//    {
-//        if(mapperBuffer.contains(".")) //complete error has been recieved
-//        {
-//            int start;
-//            int end;
-//            QString tempdat;
-//            for(int j = 0; j < mapperBuffer.length(); j++)
-//            {
-//                if(mapperBuffer.at(j) == '!') // beggingin of error message
-//                {
-//                    start = j;
-//                }
-//                if(mapperBuffer.at(j) == '.') // beggingin of error message
-//                {
-//                    end = j;
-//                }
-//            }
-//            int index = start;
-//            for(start; start <= end; start++)
-//            {
-//                tempdat.append(mapperBuffer.at(index));
-//                mapperBuffer.remove(index,1);
-//            }
-//            list.append(tempdat);
-//            emit recieveMapperInstr();
-//        }
-//    }
-//    else if(mapper_serialData.length() >= 5) //a packet of data has been sent and is ready to be
-//    {
-//        QString dat;
-//        for(int i = 0; i < 5; i++)
-//        {
-//            dat.append(mapperBuffer.at(0));
-//            mapperBuffer.remove(0,1);
-//        }
-//        list.append(dat);
-//        emit recieveMapperInstr(); //sends signal that an instruction has been recieved and added to list
-//    }
+            for(start; start <= end; start++)
+            {
+                tempdat.append(mapperBuffer.at(index));
+                mapperBuffer.remove(index,1);
+            }
+            list.append(tempdat);
+            emit recieveMapperInstr();
+            return;
+        }
+    }
+    else if(mapperBuffer.length() >= 5) //a packet of data has been sent and is ready to be
+    {
+        QString dat;
+        for(int i = 0; i < 5; i++)
+        {
+            dat.append(mapperBuffer.at(0));
+            mapperBuffer.remove(0,1);
+        }
+        list.append(dat);
+        emit recieveMapperInstr(); //sends signal that an instruction has been recieved and added to list
+        return;
+    }
 }
 
 void SerialPort::sendMapperStart() //send start signal to mapper

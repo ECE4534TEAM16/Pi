@@ -469,6 +469,7 @@ void Widget::on_RoleEndChange()
 
 void Widget::mapper_recieveData() //a full instruction or error has been recieved and signal sent from serialport.cpp
 {
+    qDebug() << "in mapper_receiveData slot in widget.cpp..... Hope everything fackin works";
     QString temp;
     mapperDat.append(ports->list); //will copy what is in the instruction buffer
     ports->list.clear(); //clears list instruction buffer
