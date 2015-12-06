@@ -14,6 +14,8 @@
 #include <QList>
 #include <QQueue>
 #include <QTime>
+#include <math.h>
+#include <QtAlgorithms>
 
 
 #define TEST            true
@@ -30,6 +32,17 @@ enum CURRENT_DIRECTION          //will state the rovers current direction with r
     DOWN
 };
 
+struct listDat
+{
+    int col;
+    int row;
+    int cost;
+
+    bool operator<(const listDat& other) const
+    {
+        return cost < other.cost;
+    }
+};
 
 
 namespace Ui {
@@ -50,6 +63,9 @@ public:
     void updateDir(QString newDir);
     void drawIntersection(QString intersection);
     void mazeBuild();
+    void setDists(int col, int row);
+    void A_star(int col, int row);
+    void findAdjacent(int col, int row);
 
 
 public slots:
@@ -90,6 +106,9 @@ private:
     QStringList buildList;
     QTime mapperTime;
     bool mapper_completed;
+    bool end_exists;
+    QList<listDat> openList;
+    int count;
 
 
 

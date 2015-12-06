@@ -184,7 +184,7 @@ void SerialPort::readMapperSerial()
     QRegExp re("[A-Za-z0-9]");
     tempstr.remove(QChar(QChar::Null));
     qDebug() << tempstr;
-    if(tempstr.contains(re) || tempstr.contains("#" || tempstr.contains("!" || tempstr.contains("."))))                    //re.exactMatch(tempstr)
+    if(tempstr.contains(re) || tempstr.contains("#") || tempstr.contains("!") || tempstr.contains("."))                    //re.exactMatch(tempstr)
     {
         qDebug() << "passed mapper regexp";
         int length = tempstr.length();
@@ -244,6 +244,7 @@ void SerialPort::readMapperSerial()
             emit recieveMapperInstr();
             return;
         }
+        return;
     }
     else if(mapperBuffer.length() >= 5) //a packet of data has been sent and is ready to be
     {

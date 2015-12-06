@@ -8,6 +8,13 @@ mazecell::mazecell()
 {
     isMaze = false;
     isNode = false;
+    isPath = false;
+    visited = false;
+    distToEnd = -1;
+    distToStart = -1;
+    F = -1;
+    parent_col = -1;
+    parent_row = -1;
 }
 
 QRectF mazecell::boundingRect() const
@@ -18,11 +25,17 @@ QRectF mazecell::boundingRect() const
 
 void mazecell::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    bool path = false;
     QRectF rec = boundingRect();
     QBrush brush(Qt::black);
 
+    if(isPath)
+    {
+        brush.setColor(Qt::blue);
+        path = true;
 
-    if(isNode)
+    }
+    if(isNode && !path)
     {
         if(cellRole == START)
         {

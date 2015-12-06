@@ -38,9 +38,19 @@ public:
 
     bool isMaze;
     bool isNode;
+    bool isPath;
+    bool visited;
     INTERSECTION intersectionType;
 
     ROLE cellRole;
+    int x_pos;
+    int y_pos;
+    int recSize;
+    double distToEnd;
+    double distToStart;
+    double F;
+    int parent_col;
+    int parent_row;
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -53,10 +63,8 @@ private slots:
     void cellDialogStartChange();
     void cellDialogEndChange();
 
-private:
-    int x_pos;
-    int y_pos;
-    int recSize;
+//private:
+
 
 };
 

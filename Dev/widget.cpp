@@ -25,6 +25,7 @@ Widget::Widget(QWidget *parent) :
     endCol = -1;
     endRow = -1;
     mapper_completed = false;
+    end_exists = false;
 
     ports = new SerialPort();
 
@@ -50,7 +51,7 @@ Widget::Widget(QWidget *parent) :
         {
             int tempx = j*CELL_SIZE;
             int tempy = i*CELL_SIZE;
-            if(i == mazeCol && j == mazeRow)
+            if(i == mazeCol && j == mazeRow) //sets the default start node
             {
                 mazeArray->at(i).at(j)->isMaze = true;
                 mazeArray->at(i).at(j)->isNode = true;
@@ -64,9 +65,9 @@ Widget::Widget(QWidget *parent) :
             }
             else
             {
-            mazeArray->at(i).at(j)->setpos(tempx,tempy,CELL_SIZE);          //set the position and size of each cell
-            mazeArray->at(i).at(j)->setRole(NONMAZE);
-            scene->addItem(mazeArray->at(i).at(j));                         //add that cell to the scene
+                mazeArray->at(i).at(j)->setpos(tempx,tempy,CELL_SIZE);          //set the position and size of each cell
+                mazeArray->at(i).at(j)->setRole(NONMAZE);
+                scene->addItem(mazeArray->at(i).at(j));                         //add that cell to the scene
             }
         }
     }
@@ -410,6 +411,116 @@ void Widget::mazeBuild()
 
 }
 
+void Widget::setDists(int col, int row) //set A* distances for all maze cells
+{
+    if(mazeArray->at(col).at(row)->isMaze)
+    {
+        int currCell_x, currCell_y, start_y, start_x, end_x, end_y;
+        double toEnd, toStart, x_diff, y_diff;
+        currCell_x = mazeArray->at(col).at(row)->x_pos;
+        currCell_y = mazeArray->at(col).at(row)->y_pos;
+        start_x = mazeArray->at(startCol).at(startRow)->x_pos;
+        start_y = mazeArray->at(startCol).at(startRow)->y_pos;
+        end_x = mazeArray->at(endCol).at(endRow)->x_pos;
+        end_y = mazeArray->at(endCol).at(endRow)->y_pos;
+
+        //to the end
+        x_diff = currCell_x - end_x; //(x2-x1)
+        x_diff = x_diff*x_diff; //squared
+        y_diff = currCell_y - end_y; // (y2-y1)
+        y_diff = y_diff*y_diff; //squared
+
+        toEnd = sqrt(x_diff+y_diff);
+
+        mazeArray->at(col).at(row)->distToEnd = toEnd;
+        //
+
+        //to the start
+        x_diff = currCell_x - start_x; //(x2-x1)
+        x_diff = x_diff*x_diff; //squared
+        y_diff = currCell_y - start_y; // (y2-y1)
+        y_diff = y_diff*y_diff; //squared
+
+        toStart = sqrt(x_diff+y_diff);
+
+        mazeArray->at(col).at(row)->distToStart = toStart;
+        mazeArray->at(col).at(row)->F = toStart+toEnd;
+        //
+        qDebug() << row << "," << col <<  " : " <<  toStart+toEnd;
+    }
+
+
+}
+
+void Widget::A_star(int col, int row)
+{
+    qDebug() << col << "," << row;
+    qDebug() << "begin A*" << mazeArray->at(col).at(row)->cellRole << "|" <<mazeArray->at(col).at(row)->F;
+    int newcol;
+    int newrow;
+    mazeArray->at(col).at(row)->visited = true;
+    if(mazeArray->at(col).at(row)->cellRole == END) //found the end
+    {
+        qDebug() << "we found a solution!";
+        return;
+
+    }
+    findAdjacent(col, row);
+    newcol = openList.at(0).col;
+    newrow = openList.at(0).row;
+    openList.removeFirst();
+    count ++;
+    if(count < 100)
+        A_star(newcol, newrow); //recursion baby!
+    qDebug() << "end A*";
+}
+
+void Widget::findAdjacent(int col, int row) //find and adds adjecent to openlist, if cell has been visited it is not added, sorts openlist
+{
+    qDebug() << "in findAdjacent";
+    listDat temp;
+    if(mazeArray->at(col-1).at(row)->isMaze && !mazeArray->at(col-1).at(row)->visited) //to the left
+    {
+        temp.row = row;
+        temp.col = col-1;
+        temp.cost = mazeArray->at(col-1).at(row)->F;
+        openList.append(temp);
+        mazeArray->at(col-1).at(row)->parent_col = col;
+        mazeArray->at(col-1).at(row)->parent_row = row;
+    }
+    if(mazeArray->at(col+1).at(row)->isMaze && !mazeArray->at(col+1).at(row)->visited) //to the right
+    {
+        temp.row = row;
+        temp.col = col+1;
+        temp.cost = mazeArray->at(col+1).at(row)->F;
+        openList.append(temp);
+        mazeArray->at(col+1).at(row)->parent_col = col;
+        mazeArray->at(col+1).at(row)->parent_row = row;
+    }
+    if(mazeArray->at(col).at(row-1)->isMaze && !mazeArray->at(col).at(row-1)->visited) //above
+    {
+        temp.row = row-1;
+        temp.col = col;
+        temp.cost = mazeArray->at(col).at(row-1)->F;
+        openList.append(temp);
+        mazeArray->at(col).at(row-1)->parent_col = col;
+        mazeArray->at(col).at(row-1)->parent_row = row;
+    }
+    if(mazeArray->at(col).at(row+1)->isMaze && !mazeArray->at(col).at(row+1)->visited) //below
+    {
+        temp.row = row+1;
+        temp.col = col;
+        temp.cost = mazeArray->at(col).at(row+1)->F;
+        openList.append(temp);
+        mazeArray->at(col).at(row+1)->parent_col = col;
+        mazeArray->at(col).at(row+1)->parent_row = row;
+    }
+
+    qSort(openList.begin(), openList.end());
+}
+
+
+
 //
 void Widget::on_RoleStartChange()
 {
@@ -443,6 +554,7 @@ void Widget::on_RoleEndChange()
                 {
                     endCol = i;
                     endRow = j;
+                    end_exists = true;
                 }
             }
         }
@@ -459,6 +571,7 @@ void Widget::on_RoleEndChange()
                 {
                     endCol = i;
                     endRow = j;
+                    end_exists = true;
                 }
             }
         }
@@ -471,7 +584,8 @@ void Widget::mapper_recieveData() //a full instruction or error has been recieve
 {
     qDebug() << "in mapper_receiveData slot in widget.cpp..... Hope everything fackin works";
     QString temp;
-    mapperDat.append(ports->list); //will copy what is in the instruction buffer
+    if(!TEST)
+        mapperDat.append(ports->list); //will copy what is in the instruction buffer
     ports->list.clear(); //clears list instruction buffer
     //update ui with current instruction
     mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions, use these processed instructions to update ui
@@ -517,6 +631,7 @@ void Widget::on_mapperStart_button_clicked()
     {
         mapperDat = ports->readline("test1.dat");
         Widget::mapper_recieveData();
+        mapper_completed = true;
     }
     else
     {
@@ -531,10 +646,14 @@ void Widget::on_userStart_button_clicked()
 
 void Widget::on_mazeSolve_button_clicked()
 {
-    if(!mapper_completed)
+    count = 0;
+    if(!mapper_completed || !end_exists)
     {
         QMessageBox mazeSolve(this);
-        mazeSolve.setText("The mapper rover must be run before the maze is solved");
+        if(!mapper_completed)
+            mazeSolve.setText("The mapper rover must be run before the maze is solved.");
+        else
+            mazeSolve.setText("No end point has been selected yet.");
         mazeSolve.setIcon(QMessageBox::Information);
         mazeSolve.setStandardButtons(QMessageBox::Ok);
         mazeSolve.setDefaultButton(QMessageBox::Ok);
@@ -548,6 +667,23 @@ void Widget::on_mazeSolve_button_clicked()
             erout << "Error, Reached default case in Widget::on_mazeSolve_button_clicked";
             exit(EXIT_FAILURE);
         }
+    }
+    else //solve the maze
+    {
+        qDebug() << "start node x: " << mazeArray->at(startCol).at(startRow)->x_pos;
+        qDebug() << "start node y: " << mazeArray->at(startCol).at(startRow)->y_pos;
+        qDebug() << "end node x: " << mazeArray->at(endCol).at(endRow)->x_pos;
+        qDebug() << "end node y: " << mazeArray->at(endCol).at(endRow)->y_pos;
+        for(int i = 0; i < GRID_SIZE ; i++)
+        {
+            for(int j = 0; j < GRID_SIZE ; j++)
+            {
+                setDists(i,j);
+            }
+        }
+        A_star(startCol, startRow);
+        qDebug() << "returned from mazesolve button.";
+
     }
 
 }
