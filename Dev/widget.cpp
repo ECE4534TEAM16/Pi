@@ -452,7 +452,7 @@ void Widget::setDists(int col, int row) //set A* distances for all maze cells
 
 }
 
-void Widget::A_star(int col, int row)
+void Widget::A_star(int col, int row) //holycrap this is so much easier implementing here than in javascript
 {
     qDebug() << col << "," << row;
     qDebug() << "begin A*" << mazeArray->at(col).at(row)->cellRole << "|" <<mazeArray->at(col).at(row)->F;
@@ -461,7 +461,22 @@ void Widget::A_star(int col, int row)
     mazeArray->at(col).at(row)->visited = true;
     if(mazeArray->at(col).at(row)->cellRole == END) //found the end
     {
+        QPair<int,int> instruction;
+        int tempcol = col;
+        int temprow = row;
         qDebug() << "we found a solution!";
+        while(mazeArray->at(tempcol).at(temprow)->cellRole != START)
+        {
+            int temp;
+            instruction.first = tempcol;
+            instruction.second = temprow;
+            temp = mazeArray->at(tempcol).at(temprow)->parent_col;
+            temprow = mazeArray->at(tempcol).at(temprow)->parent_row;
+            tempcol = temp;
+            closedList.append(instruction);
+        }
+        openList.clear();
+        for(int k = 0; k < (closedList.size()/2); k++) closedList.swap(k,closedList.size()-(1+k)); //reverses the list
         return;
 
     }
@@ -470,8 +485,8 @@ void Widget::A_star(int col, int row)
     newrow = openList.at(0).row;
     openList.removeFirst();
     count ++;
-    if(count < 100)
-        A_star(newcol, newrow); //recursion baby!
+//    if(count < 100)
+    A_star(newcol, newrow); //recursion baby!
     qDebug() << "end A*";
 }
 
@@ -517,6 +532,174 @@ void Widget::findAdjacent(int col, int row) //find and adds adjecent to openlist
     }
 
     qSort(openList.begin(), openList.end());
+}
+
+void Widget::parsePath(int pos)
+{
+    if(startCol > closedList.at(pos).first) //rover facing up, forward becomes up
+    {
+        UserDir = UP;
+    }
+    else if(startCol < closedList.at(pos).first) //rover is facing down, forward becomes down
+    {
+        UserDir = DOWN;
+    }
+    if(startRow > closedList.at(pos).second) //rover is facing left, forward becomes left
+    {
+        UserDir = LEFT;
+    }
+    else if(startRow < closedList.at(pos).second) //rover is facing right, forward becomes right
+    {
+        UserDir = RIGHT;
+    }
+
+}
+
+QString Widget::IntersectionInstr(int col, int row, int futureCol, int futureRow)
+{
+    switch (UserDir)
+    {
+    case UP:
+        if(futureCol > col) //this should not happen
+        {
+            UserDir = DOWN;
+            return "b";
+
+        }
+        else if(futureCol < col)
+        {
+            UserDir = UP;
+            return "f";
+        }
+        else if(futureRow > row)
+        {
+            UserDir = RIGHT;
+            return "r";
+        }
+        else if(futureRow < row)
+        {
+            UserDir = LEFT;
+            return "l";
+        }
+        else
+        {
+            erout << "Could not calculate instruction at intersection";
+            exit(EXIT_FAILURE);
+        }
+        break;
+    case LEFT:
+        if(futureCol > col) //this should not happen
+        {
+            UserDir = DOWN;
+            return "l";
+
+        }
+        else if(futureCol < col)
+        {
+            UserDir = UP;
+            return "r";
+        }
+        else if(futureRow > row)
+        {
+            UserDir = RIGHT;
+            return "b";
+        }
+        else if(futureRow < row)
+        {
+            UserDir = LEFT;
+            return "f";
+        }
+        else
+        {
+            erout << "Could not calculate instruction at intersection";
+            exit(EXIT_FAILURE);
+        }
+        break;
+    case RIGHT:
+        if(futureCol > col) //this should not happen
+        {
+            UserDir = DOWN;
+            return "r";
+
+        }
+        else if(futureCol < col)
+        {
+            UserDir = UP;
+            return "l";
+        }
+        else if(futureRow > row)
+        {
+            UserDir = RIGHT;
+            return "f";
+        }
+        else if(futureRow < row)
+        {
+            UserDir = LEFT;
+            return "b";
+        }
+        else
+        {
+            erout << "Could not calculate instruction at intersection";
+            exit(EXIT_FAILURE);
+        }
+        break;
+    case DOWN:
+        if(futureCol > col)
+        {
+            UserDir = DOWN;
+            return "f";
+
+        }
+        else if(futureCol < col)
+        {
+            UserDir = UP;
+            return "b";
+        }
+        else if(futureRow > row)
+        {
+            UserDir = RIGHT;
+            return "l";
+        }
+        else if(futureRow < row)
+        {
+            UserDir = LEFT;
+            return "r";
+        }
+        else
+        {
+            erout << "Could not calculate instruction at intersection";
+            exit(EXIT_FAILURE);
+        }
+        break;
+    default:
+        erout << "IntersectionInstr switch reached default case";
+        exit(EXIT_FAILURE);
+
+        break;
+    }
+}
+
+void Widget::createPathList()
+{
+    int tempcol = closedList.at(1).first;
+    int temprow = closedList.at(1).second;
+    int count = 1;
+    QString instr;
+    //calulate begging direction
+    parsePath(0);
+    while(mazeArray->at(tempcol).at(temprow)->cellRole != END && count < closedList.length()-1)
+    {
+        int tempcol = closedList.at(count).first;
+        int temprow = closedList.at(count).second;
+        if(mazeArray->at(tempcol).at(temprow)->isNode) //this is an intersection, have to add instruction here
+        {
+            instr = IntersectionInstr(tempcol, temprow, closedList.at(count+1).first, closedList.at(count+1).second);
+            userInstr.append(instr);
+        }
+        count++;
+    }
+
+    qDebug() << userInstr;
 }
 
 
@@ -582,7 +765,6 @@ void Widget::on_RoleEndChange()
 
 void Widget::mapper_recieveData() //a full instruction or error has been recieved and signal sent from serialport.cpp
 {
-    qDebug() << "in mapper_receiveData slot in widget.cpp..... Hope everything fackin works";
     QString temp;
     if(!TEST)
         mapperDat.append(ports->list); //will copy what is in the instruction buffer
@@ -683,6 +865,8 @@ void Widget::on_mazeSolve_button_clicked()
         }
         A_star(startCol, startRow);
         qDebug() << "returned from mazesolve button.";
+        qDebug() << closedList;
+        createPathList();
 
     }
 

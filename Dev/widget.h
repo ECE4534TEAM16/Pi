@@ -11,6 +11,7 @@
 #include "serialport.h"
 #include "mazecell.h"
 #include <QVector>
+#include <QPair>
 #include <QList>
 #include <QQueue>
 #include <QTime>
@@ -66,6 +67,9 @@ public:
     void setDists(int col, int row);
     void A_star(int col, int row);
     void findAdjacent(int col, int row);
+    void parsePath(int pos);
+    QString IntersectionInstr(int col, int row, int futureCol, int futureRow);
+    void createPathList();
 
 
 public slots:
@@ -90,6 +94,7 @@ private:
     SerialPort *ports;
     QStringList mapperDat;
     QStringList userDat;
+    QStringList userInstr;
     int mapperList_count;
     mazecell *cell;
     QList<QList<mazecell*> >  *mazeArray;           //2d array of mazecell graphics items
@@ -102,12 +107,14 @@ private:
     int endRow;
     int endCol;
     CURRENT_DIRECTION currDir;
+    CURRENT_DIRECTION UserDir;
     QQueue<QString> mapperQueue;
     QStringList buildList;
     QTime mapperTime;
     bool mapper_completed;
     bool end_exists;
     QList<listDat> openList;
+    QList<QPair<int,int> > closedList;
     int count;
 
 
