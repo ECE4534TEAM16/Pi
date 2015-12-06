@@ -3,17 +3,13 @@
 
 SerialPort::SerialPort()
 {
-    testList.append("S");
-    testList.append("l");
-    testList.append("r");
-    testList.append("l");
-    testList.append("l");
-    testList.append("E");
     count = 0;
 
     mapperFinished = false;
-    mapper_serial_number = "A702ZK6O";
-    user_serial_number = "AD02FKX4";
+//    mapper_serial_number = "A702ZK6O";    //proper
+//    user_serial_number = "AD02FKX4";
+    mapper_serial_number = "AD02FKX4";  //wrong serial numbers for wiflys, used to test user comms with mapper wiflys
+    user_serial_number = "A702ZK6O";
     mapper = new QSerialPort(this);
     user = new QSerialPort(this);
     bool mapper_is_available = false;
@@ -62,24 +58,23 @@ SerialPort::SerialPort()
     {
         qDebug() << "Found the user port...";
         user->setPortName(user_port_name);
-        user->open(QSerialPort::ReadWrite);
-        user->setBaudRate(QSerialPort::Baud57600);
-        user->setDataBits(QSerialPort::Data8);
-        user->setFlowControl(QSerialPort::NoFlowControl);
-        user->setParity(QSerialPort::NoParity);
-        user->setStopBits(QSerialPort::OneStop);
-        user->write("S");
-        user->write("l");
-        user->write("r");
-        user->write("l");
-        user->write("l");
-        user->write("E");
-        QObject::connect(user, SIGNAL(readyRead()), this, SLOT(readUserSerial()));
+        if(!user->open(QSerialPort::ReadWrite))
+            qDebug() << user->errorString();
+        else
+        {
+            user->setBaudRate(QSerialPort::Baud57600);
+            user->setDataBits(QSerialPort::Data8);
+            user->setFlowControl(QSerialPort::NoFlowControl);
+            user->setParity(QSerialPort::NoParity);
+            user->setStopBits(QSerialPort::OneStop);
+            connect(user, SIGNAL(readyRead()), this, SLOT(readUserSerial()));
+        }
     }
 
     qDebug() << "connecting start mapper and user signals";
     connect(this, SIGNAL(startMapper()), this, SLOT(sendMapperStart()));
     connect(this, SIGNAL(startUser()), this, SLOT(sendUserStart()));
+    connect(this, SIGNAL(sendUserPath()), this, SLOT(sendUserSerial()));
 
     if(mapper->isOpen())
     {
@@ -163,6 +158,13 @@ void SerialPort::sendMapperStartSignal()
 void SerialPort::sendUserStartSignal()
 {
     emit startUser();
+}
+
+void SerialPort::sendPath(QStringList path)
+{
+    pathDat = path;
+    qDebug() << pathDat;
+    emit sendUserPath();
 }
 
 QStringList SerialPort::returnList()
@@ -275,6 +277,18 @@ void SerialPort::sendUserStart()
 void SerialPort::sendUserSerial()
 {
 
+    qDebug() << "in send user serial";
+    QString tempstr;
+    int j = 0;
+    while(j < pathDat.length())
+    {
+        tempstr = pathDat.at(j);
+        const char* dat = tempstr.toStdString().c_str();
+        int length = tempstr.length();
+        user->write(dat, length);
+        j++;
+
+    }
 }
 
 void SerialPort::readUserSerial()

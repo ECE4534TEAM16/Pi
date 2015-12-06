@@ -823,7 +823,10 @@ void Widget::on_mapperStart_button_clicked()
 
 void Widget::on_userStart_button_clicked()
 {
-
+    QString end_sig = "E";
+    ports->sendUserStartSignal();
+    userInstr.append(end_sig);
+    ports->sendPath(userInstr);
 }
 
 void Widget::on_mazeSolve_button_clicked()
@@ -852,10 +855,6 @@ void Widget::on_mazeSolve_button_clicked()
     }
     else //solve the maze
     {
-        qDebug() << "start node x: " << mazeArray->at(startCol).at(startRow)->x_pos;
-        qDebug() << "start node y: " << mazeArray->at(startCol).at(startRow)->y_pos;
-        qDebug() << "end node x: " << mazeArray->at(endCol).at(endRow)->x_pos;
-        qDebug() << "end node y: " << mazeArray->at(endCol).at(endRow)->y_pos;
         for(int i = 0; i < GRID_SIZE ; i++)
         {
             for(int j = 0; j < GRID_SIZE ; j++)
@@ -864,10 +863,7 @@ void Widget::on_mazeSolve_button_clicked()
             }
         }
         A_star(startCol, startRow);
-        qDebug() << "returned from mazesolve button.";
-        qDebug() << closedList;
         createPathList();
-
     }
 
 }

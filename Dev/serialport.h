@@ -27,12 +27,14 @@ public:
     QStringList readline(QString filename); //only used during testing
     void sendMapperStartSignal();
     void sendUserStartSignal();
+    void sendPath(QStringList path);
     QStringList returnList();
 
 signals:
     void startMapper();
     void startUser();
     void recieveMapperInstr();
+    void sendUserPath();
 
 private slots:
     void readMapperSerial();
@@ -55,6 +57,7 @@ private:
     QString mapperBuffer;
     QString parsed_mapData;
     bool mapperFinished;
+    QStringList pathDat;
 };
 
 #endif // SERIALPORT_H
