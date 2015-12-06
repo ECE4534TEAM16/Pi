@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_SerialPort_t {
-    QByteArrayData data[12];
-    char stringdata0[163];
+    QByteArrayData data[14];
+    char stringdata0[202];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,16 +36,19 @@ QT_MOC_LITERAL(3, 24, 9), // "startUser"
 QT_MOC_LITERAL(4, 34, 18), // "recieveMapperInstr"
 QT_MOC_LITERAL(5, 53, 12), // "sendUserPath"
 QT_MOC_LITERAL(6, 66, 19), // "user_error_recieved"
-QT_MOC_LITERAL(7, 86, 16), // "readMapperSerial"
-QT_MOC_LITERAL(8, 103, 15), // "sendMapperStart"
-QT_MOC_LITERAL(9, 119, 13), // "sendUserStart"
-QT_MOC_LITERAL(10, 133, 14), // "sendUserSerial"
-QT_MOC_LITERAL(11, 148, 14) // "readUserSerial"
+QT_MOC_LITERAL(7, 86, 21), // "mapper_error_recieved"
+QT_MOC_LITERAL(8, 108, 16), // "recieveMapperEnd"
+QT_MOC_LITERAL(9, 125, 16), // "readMapperSerial"
+QT_MOC_LITERAL(10, 142, 15), // "sendMapperStart"
+QT_MOC_LITERAL(11, 158, 13), // "sendUserStart"
+QT_MOC_LITERAL(12, 172, 14), // "sendUserSerial"
+QT_MOC_LITERAL(13, 187, 14) // "readUserSerial"
 
     },
     "SerialPort\0startMapper\0\0startUser\0"
     "recieveMapperInstr\0sendUserPath\0"
-    "user_error_recieved\0readMapperSerial\0"
+    "user_error_recieved\0mapper_error_recieved\0"
+    "recieveMapperEnd\0readMapperSerial\0"
     "sendMapperStart\0sendUserStart\0"
     "sendUserSerial\0readUserSerial"
 };
@@ -57,28 +60,32 @@ static const uint qt_meta_data_SerialPort[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       5,       // signalCount
+       7,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   64,    2, 0x06 /* Public */,
-       3,    0,   65,    2, 0x06 /* Public */,
-       4,    0,   66,    2, 0x06 /* Public */,
-       5,    0,   67,    2, 0x06 /* Public */,
-       6,    0,   68,    2, 0x06 /* Public */,
+       1,    0,   74,    2, 0x06 /* Public */,
+       3,    0,   75,    2, 0x06 /* Public */,
+       4,    0,   76,    2, 0x06 /* Public */,
+       5,    0,   77,    2, 0x06 /* Public */,
+       6,    0,   78,    2, 0x06 /* Public */,
+       7,    0,   79,    2, 0x06 /* Public */,
+       8,    0,   80,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    0,   69,    2, 0x08 /* Private */,
-       8,    0,   70,    2, 0x08 /* Private */,
-       9,    0,   71,    2, 0x08 /* Private */,
-      10,    0,   72,    2, 0x08 /* Private */,
-      11,    0,   73,    2, 0x08 /* Private */,
+       9,    0,   81,    2, 0x08 /* Private */,
+      10,    0,   82,    2, 0x08 /* Private */,
+      11,    0,   83,    2, 0x08 /* Private */,
+      12,    0,   84,    2, 0x08 /* Private */,
+      13,    0,   85,    2, 0x08 /* Private */,
 
  // signals: parameters
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -106,11 +113,13 @@ void SerialPort::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 2: _t->recieveMapperInstr(); break;
         case 3: _t->sendUserPath(); break;
         case 4: _t->user_error_recieved(); break;
-        case 5: _t->readMapperSerial(); break;
-        case 6: _t->sendMapperStart(); break;
-        case 7: _t->sendUserStart(); break;
-        case 8: _t->sendUserSerial(); break;
-        case 9: _t->readUserSerial(); break;
+        case 5: _t->mapper_error_recieved(); break;
+        case 6: _t->recieveMapperEnd(); break;
+        case 7: _t->readMapperSerial(); break;
+        case 8: _t->sendMapperStart(); break;
+        case 9: _t->sendUserStart(); break;
+        case 10: _t->sendUserSerial(); break;
+        case 11: _t->readUserSerial(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -146,6 +155,18 @@ void SerialPort::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
                 *result = 4;
             }
         }
+        {
+            typedef void (SerialPort::*_t)();
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&SerialPort::mapper_error_recieved)) {
+                *result = 5;
+            }
+        }
+        {
+            typedef void (SerialPort::*_t)();
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&SerialPort::recieveMapperEnd)) {
+                *result = 6;
+            }
+        }
     }
     Q_UNUSED(_a);
 }
@@ -175,13 +196,13 @@ int SerialPort::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 12;
     }
     return _id;
 }
@@ -214,5 +235,17 @@ void SerialPort::sendUserPath()
 void SerialPort::user_error_recieved()
 {
     QMetaObject::activate(this, &staticMetaObject, 4, Q_NULLPTR);
+}
+
+// SIGNAL 5
+void SerialPort::mapper_error_recieved()
+{
+    QMetaObject::activate(this, &staticMetaObject, 5, Q_NULLPTR);
+}
+
+// SIGNAL 6
+void SerialPort::recieveMapperEnd()
+{
+    QMetaObject::activate(this, &staticMetaObject, 6, Q_NULLPTR);
 }
 QT_END_MOC_NAMESPACE

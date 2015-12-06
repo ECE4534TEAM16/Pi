@@ -19,7 +19,7 @@
 #include <QtAlgorithms>
 
 
-#define TEST            true
+#define TEST            false
 #define DEBUG           true
 #define GRID_SIZE       75
 #define CELL_SIZE       10
@@ -77,6 +77,8 @@ public slots:
     void on_RoleEndChange();
     void mapper_recieveData();
     void user_ui_update();
+    void mapper_ui_update();
+    void mapper_finished();
 
 private slots:
     void on_mapperStart_button_clicked();
@@ -118,6 +120,7 @@ private:
     QList<listDat> openList;
     QList<QPair<int,int> > closedList;
     int count;
+    bool solved;
 
 
 

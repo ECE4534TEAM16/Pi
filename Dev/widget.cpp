@@ -26,6 +26,7 @@ Widget::Widget(QWidget *parent) :
     endRow = -1;
     mapper_completed = false;
     end_exists = false;
+    solved = false;
 
     ports = new SerialPort();
 
@@ -76,6 +77,8 @@ Widget::Widget(QWidget *parent) :
 
     connect(ports, SIGNAL(recieveMapperInstr()), this, SLOT(mapper_recieveData()));
     connect(ports, SIGNAL(user_error_recieved()), this, SLOT(user_ui_update()));
+    connect(ports, SIGNAL(mapper_error_recieved()), this, SLOT(mapper_ui_update()));
+    connect(ports, SIGNAL(recieveMapperEnd()), this, SLOT(mapper_finished()));
     mapperList_count = 0;
 
 
@@ -371,7 +374,8 @@ void Widget::mazeBuild()
     int dist;
     QString intersection;
     QString newDir;
-    mapperQueue.enqueue(buildList.at(mapperList_count));
+    qDebug() << buildList;
+    mapperQueue.enqueue(buildList.at(buildList.length()-1));
     while(!mapperQueue.isEmpty())
     {
         QString temp = mapperQueue.dequeue();
@@ -766,40 +770,24 @@ void Widget::on_RoleEndChange()
 
 void Widget::mapper_recieveData() //a full instruction or error has been recieved and signal sent from serialport.cpp
 {
+     qDebug() << "recieveData";
     QString temp;
     if(!TEST)
         mapperDat.append(ports->list); //will copy what is in the instruction buffer
     ports->list.clear(); //clears list instruction buffer
     //update ui with current instruction
+    qDebug() << "before data parse";
     mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions, use these processed instructions to update ui
+    qDebug() << "after data parse";
     for(int i = 0; i < mapperDat.size(); i++)
     {
+        qDebug() << mapperDat;
         temp = mapperDat.at(i);
-        if(temp.at(0) == 'W')//warning
-        {
+        ui->mapperList->addItem(temp);
+        qDebug() << "before maze build";
+        mazeBuild();
+        mapperList_count++;
 
-            ui->mapperList->addItem(temp);
-            ui->mapperList->item(mapperList_count)->setTextColor(QColor(255,165,0));
-            mapperList_count++;
-        }
-        else if(temp.at(0) == 'E')//Error
-        {
-            ui->mapperList->addItem(mapperDat.at(i));
-            ui->mapperList->item(mapperList_count)->setTextColor(Qt::darkRed);
-            mapperList_count++;
-        }
-        else if(temp == "At end of maze")//end of instructions
-        {
-            //set some kind of flag indicating that the end of the maze has been reached
-            //should no longer recieve data from mapper rover
-            mapper_completed = true;
-        }
-        else//instruction
-        {
-            ui->mapperList->addItem(temp);
-            mazeBuild();
-            mapperList_count++;
-        }
     }
     mapperDat.clear();
 
@@ -817,6 +805,26 @@ void Widget::user_ui_update()
     userList_count++;
     ports->user_error.clear();
 
+}
+
+void Widget::mapper_ui_update()
+{
+    ports->mapper_error.remove(0,1);
+    ui->mapperList->addItem(ports->mapper_error);
+    if(ports->mapper_error.at(0) == 'E')
+        ui->mapperList->item(mapperList_count)->setTextColor(Qt::darkRed);
+    else if(ports->mapper_error.at(0) == 'W')
+        ui->mapperList->item(mapperList_count)->setTextColor(QColor(255,165,0));
+    else{}
+    mapperList_count++;
+    ports->mapper_error.clear();
+}
+
+void Widget::mapper_finished()
+{
+    ui->mapperList->addItem("Mapper rover has finished");
+    mapperList_count++;
+    mapper_completed = true;
 }
 
 
@@ -837,10 +845,31 @@ void Widget::on_mapperStart_button_clicked()
 
 void Widget::on_userStart_button_clicked()
 {
-    QString end_sig = "E";
-    ports->sendUserStartSignal();
-    userInstr.append(end_sig);
-    ports->sendPath(userInstr);
+    if(!solved)
+    {
+        QMessageBox mazeSolve(this);
+        mazeSolve.setText("The maze has not been solved for yet");
+        mazeSolve.setIcon(QMessageBox::Information);
+        mazeSolve.setStandardButtons(QMessageBox::Ok);
+        mazeSolve.setDefaultButton(QMessageBox::Ok);
+        mazeSolve.setWindowTitle("Unable to Start User");
+        int ret = mazeSolve.exec();
+        switch(ret)
+        {
+        case QMessageBox::Ok:
+            break;
+        default:
+            erout << "Error, Reached default case in Widget::on_mazeSolve_button_clicked";
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        QString end_sig = "E";
+        ports->sendUserStartSignal();
+        userInstr.append(end_sig);
+        ports->sendPath(userInstr);
+    }
 }
 
 void Widget::on_mazeSolve_button_clicked()
@@ -878,6 +907,7 @@ void Widget::on_mazeSolve_button_clicked()
         }
         A_star(startCol, startRow);
         createPathList();
+        solved = true;
     }
 
 }

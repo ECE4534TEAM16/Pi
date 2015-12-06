@@ -25,6 +25,7 @@ public:
     ~SerialPort();
     QStringList list;
     QString user_error;
+    QString mapper_error;
     QStringList readline(QString filename); //only used during testing
     void sendMapperStartSignal();
     void sendUserStartSignal();
@@ -37,6 +38,8 @@ signals:
     void recieveMapperInstr();
     void sendUserPath();
     void user_error_recieved();
+    void mapper_error_recieved();
+    void recieveMapperEnd();
 
 private slots:
     void readMapperSerial();
