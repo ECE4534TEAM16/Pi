@@ -76,6 +76,7 @@ public slots:
     void on_RoleStartChange();
     void on_RoleEndChange();
     void mapper_recieveData();
+    void user_ui_update();
 
 private slots:
     void on_mapperStart_button_clicked();
@@ -96,6 +97,7 @@ private:
     QStringList userDat;
     QStringList userInstr;
     int mapperList_count;
+    int userList_count;
     mazecell *cell;
     QList<QList<mazecell*> >  *mazeArray;           //2d array of mazecell graphics items
     int mazeRow;

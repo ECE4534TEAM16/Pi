@@ -10,7 +10,7 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-
+    userList_count = 0;
     scene = new QGraphicsScene(this);
     ui->mazeView->setScene(scene);
     mazeArray = new QList<QList<mazecell*> >;           //the first QList represents the columns, second represents the rows
@@ -75,6 +75,7 @@ Widget::Widget(QWidget *parent) :
 
 
     connect(ports, SIGNAL(recieveMapperInstr()), this, SLOT(mapper_recieveData()));
+    connect(ports, SIGNAL(user_error_recieved()), this, SLOT(user_ui_update()));
     mapperList_count = 0;
 
 
@@ -802,6 +803,19 @@ void Widget::mapper_recieveData() //a full instruction or error has been recieve
     }
     mapperDat.clear();
 
+
+}
+
+void Widget::user_ui_update()
+{
+    ui->userList->addItem(ports->user_error);
+    if(ports->user_error.at(0) == 'E')
+        ui->userList->item(userList_count)->setTextColor(Qt::darkRed);
+    else if(ports->user_error.at(0) == 'W')
+        ui->userList->item(userList_count)->setTextColor(QColor(255,165,0));
+    else{}
+    userList_count++;
+    ports->user_error.clear();
 
 }
 

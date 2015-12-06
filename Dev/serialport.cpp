@@ -268,13 +268,13 @@ void SerialPort::sendMapperStart() //send start signal to mapper
         mapper->write(dat, 1);
 }
 
-void SerialPort::sendUserStart()
+void SerialPort::sendUserStart() //final
 {
         const char* dat = "S";
         user->write(dat, 1);
 }
 
-void SerialPort::sendUserSerial()
+void SerialPort::sendUserSerial() //final
 {
 
     qDebug() << "in send user serial";
@@ -291,25 +291,35 @@ void SerialPort::sendUserSerial()
     }
 }
 
-void SerialPort::readUserSerial()
+void SerialPort::readUserSerial() //final
 {
+/*                 Serial Communiction In                           */
 
-//    user_serialData.clear();
-//    user_serialData = user->readAll();
-//    qDebug() << "user data read in from serial port";
-//    QString tempstr = QString::fromStdString(user_serialData.toStdString());
-//    qDebug() << "tempstr created";
-//    QRegExp re("[A-Za-z0-9]");
-//    tempstr.remove(QChar(QChar::Null));
-//    qDebug() << tempstr;
-//    int length = tempstr.length();
-//    const char* dat = testList.at(count).toStdString().c_str();
-//    user->write(dat, length); //used to echo characters back, will not be in release
-//    userBuffer.append(dat);
-//    user_serialData.clear();
-
+    user_serialData.clear();
+    user_serialData = user->readAll();
+    QString tempstr = QString::fromStdString(user_serialData.toStdString());
+    QRegExp re("[A-Za-z0-9]");
+    tempstr.remove(QChar(QChar::Null));
+    if(tempstr.contains(re) || tempstr.contains(" ") || tempstr.contains("!") || tempstr.contains("."))
+    {
+        userBuffer.append(tempstr);
+        user_serialData.clear();
+    }
+/*                             END                                   */
 
 
+    if(userBuffer.contains(".")) //this is the end of an error message
+    {
+        //signal to widget.cpp to update with user_error
+        int endpos = userBuffer.indexOf(".");
+        for(int i = 0; i < endpos+1; i++)
+        {
+            user_error.append(userBuffer.at(0));
+            userBuffer.remove(0,1);
+        }
+        emit user_error_recieved();
+
+    }
 
 }
 
