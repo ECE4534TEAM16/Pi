@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Maze Solver</string>
+   <string>Mapping Rovers</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -85,7 +85,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Maze Solving Robots</string>
+            <string>Map Solving Robots</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -172,7 +172,7 @@
          <item>
           <widget class="QPushButton" name="mazeSolve_button">
            <property name="text">
-            <string>Solve Maze</string>
+            <string>Solve Map</string>
            </property>
           </widget>
          </item>

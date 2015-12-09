@@ -252,11 +252,11 @@ public:
 
     void retranslateUi(QWidget *Widget)
     {
-        Widget->setWindowTitle(QApplication::translate("Widget", "Maze Solver", 0));
+        Widget->setWindowTitle(QApplication::translate("Widget", "Mapping Rovers", 0));
         label_2->setText(QApplication::translate("Widget", "Mapper Operation Log", 0));
         label->setText(QApplication::translate("Widget", "User Operation Log", 0));
         label_4->setText(QApplication::translate("Widget", "ECE 4534 Team 16", 0));
-        label_9->setText(QApplication::translate("Widget", "Maze Solving Robots", 0));
+        label_9->setText(QApplication::translate("Widget", "Map Solving Robots", 0));
         label_3->setText(QApplication::translate("Widget", "Created by:", 0));
         label_5->setText(QApplication::translate("Widget", "Michael Chuber", 0));
         label_6->setText(QApplication::translate("Widget", "Austin Lamicella", 0));
@@ -264,7 +264,7 @@ public:
         label_8->setText(QApplication::translate("Widget", "Tyler Olson", 0));
         mapperStart_button->setText(QApplication::translate("Widget", "Start Mapper Rover", 0));
         userStart_button->setText(QApplication::translate("Widget", "Start User Rover", 0));
-        mazeSolve_button->setText(QApplication::translate("Widget", "Solve Maze", 0));
+        mazeSolve_button->setText(QApplication::translate("Widget", "Solve Map", 0));
         constraints_button->setText(QApplication::translate("Widget", "Application Constraints", 0));
         exit_button->setText(QApplication::translate("Widget", "Exit Application", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("Widget", "Control and Logs", 0));

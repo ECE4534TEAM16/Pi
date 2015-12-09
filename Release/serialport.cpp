@@ -189,7 +189,7 @@ void SerialPort::readMapperSerial()
     }
 /*                             END                                   */
 
-    if(mapperBuffer.at(0) == 'E') //end
+    if(mapperBuffer.at(4) == 'E') //end
     {
         list.append(mapperBuffer);
         emit recieveMapperEnd();

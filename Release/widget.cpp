@@ -384,6 +384,7 @@ void Widget::mazeBuild()
     mapperQueue.enqueue(buildList.at(buildList.length()-1));
     while(!mapperQueue.isEmpty())
     {
+        qDebug() << mapperQueue;
         QString temp = mapperQueue.dequeue();
         instruction = temp.split(",");          //[0] = distance [1] = intersection type [2] = new direction
         if(instruction.size() > 3)
@@ -419,6 +420,7 @@ void Widget::mazeBuild()
 
         }
     }
+     qDebug() << mapperQueue << " should be empty";
 
 }
 
@@ -764,6 +766,8 @@ void Widget::mapper_recieveData() //a full instruction or error has been recieve
     QString temp;
     if(!TEST)
         mapperDat.append(ports->list); //will copy what is in the instruction buffer
+    qDebug() << mapperDat;
+    qDebug() << ports->list;
     ports->list.clear(); //clears list instruction buffer
     //update ui with current instruction
     mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions, use these processed instructions to update ui
@@ -809,6 +813,21 @@ void Widget::mapper_ui_update()
 
 void Widget::mapper_finished()
 {
+    QString temp = ports->list.back();
+    temp.replace("E", "b");
+    mapperDat.append(temp);
+    mapperDat = parseM_dat(mapperDat);              //mapperDat will contain set of instructions, use these processed instructions to update ui
+    for(int i = 0; i < mapperDat.size(); i++)
+    {
+        qDebug() << mapperDat;
+        temp = mapperDat.at(i);
+        ui->mapperList->addItem(temp);
+        mazeBuild();
+        mapperList_count++;
+
+    }
+    mapperDat.clear();
+
     ui->mapperList->addItem("Mapper rover has finished");
     mapperList_count++;
     mapper_completed = true;
@@ -859,7 +878,7 @@ void Widget::on_userStart_button_clicked()
         ports->sendPath(userInstr);
     }
 }
-
+//save it
 void Widget::on_mazeSolve_button_clicked()
 {
     count = 0;
@@ -905,7 +924,7 @@ void Widget::on_mazeSolve_button_clicked()
 void Widget::on_constraints_button_clicked()
 {
     QMessageBox constraints(this);
-    constraints.setText(" - The maze must be confined to a 9x9 foot box\n - The mapper rover must be run before the user rover");
+    constraints.setText(" - The map must be confined to a 9x9 foot box\n - The mapper rover must be run before the user rover");
     constraints.setIcon(QMessageBox::Information);
     constraints.setStandardButtons(QMessageBox::Ok);
     constraints.setDefaultButton(QMessageBox::Ok);
