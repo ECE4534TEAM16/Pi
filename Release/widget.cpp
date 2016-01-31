@@ -461,7 +461,7 @@ void Widget::setDists(int col, int row) //set A* distances for all maze cells
     }
 }
 
-void Widget::A_star(int col, int row) //holycrap this is so much easier implementing here than in javascript
+void Widget::A_star(int col, int row) 
 {
     int newcol;
     int newrow;
@@ -491,7 +491,7 @@ void Widget::A_star(int col, int row) //holycrap this is so much easier implemen
     newrow = openList.at(0).row;
     openList.removeFirst();
     count ++;
-    A_star(newcol, newrow); //recursion baby!
+    A_star(newcol, newrow); 
 }
 
 void Widget::findAdjacent(int col, int row) //find and adds adjecent to openlist, if cell has been visited it is not added, sorts openlist
